@@ -1,0 +1,22 @@
+{
+  "name": "lumivr",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JKLumirithmic/LumiVR.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/JKLumirithmic/LumiVR/issues"
+  },
+  "homepage": "https://github.com/JKLumirithmic/LumiVR#readme",
+  "dependencies": {
+    "babylonjs": "^6.27.1"
+  }
+}

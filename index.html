@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Babylon.js WebXR Example</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      #renderCanvas {
+        width: 100%;
+        height: 100%;
+        touch-action: none;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="renderCanvas"></canvas>
+
+    <script src="https://cdn.babylonjs.com/babylon.js"></script>
+    <script src="https://preview.babylonjs.com/loaders/babylonjs.loaders.min.js"></script>
+
+    <script>
+      window.addEventListener("DOMContentLoaded", function () {
+        var canvas = document.getElementById("renderCanvas");
+        var engine = new BABYLON.Engine(canvas, true);
+
+        var createScene = function () {
+          var scene = new BABYLON.Scene(engine);
+          var camera = new BABYLON.ArcRotateCamera(
+            "Camera",
+            Math.PI / 2,
+            Math.PI / 3,
+            4,
+            (0, 10, 0),
+            scene
+          );
+          camera.attachControl(canvas, true);
+          var light = new BABYLON.HemisphericLight(
+            "light1",
+            new BABYLON.Vector3(0, 1, 0),
+            scene
+          );
+
+          BABYLON.SceneLoader.ImportMesh(
+            "",
+            "",
+            "JayVR.glb",
+            scene,
+            function (meshes) {
+              console.log("Meshes loaded:", meshes);
+            }
+          );
+
+          return scene;
+        };
+
+        var scene = createScene();
+
+        scene
+          .whenReadyAsync()
+          .then(() => {
+            return BABYLON.WebXRDefaultExperience.CreateAsync(scene, {
+              // Optional configuration for the WebXR experience
+              floorMeshes: [], // e.g., provide any floor meshes for teleportation
+            });
+          })
+          .then((xrHelper) => {
+            // The WebXR experience is ready
+            console.log("WebXR initialized");
+            xrHelper.input.onControllerAddedObservable.add((controller) => {
+              controller.onMotionControllerInitObservable.add(
+                (motionController) => {
+                  const leftThumbstick = motionController.getComponent(
+                    "xr-standard-thumbstick"
+                  );
+                  if (leftThumbstick) {
+                    leftThumbstick.onAxisValueChangedObservable.add((axes) => {
+                      xrHelper.baseExperience.camera.position.addInPlace(
+                        new BABYLON.Vector3(axes.x, 0, axes.y)
+                      );
+                    });
+                  }
+                }
+              );
+            });
+          });
+
+        engine.runRenderLoop(function () {
+          scene.render();
+        });
+
+        window.addEventListener("resize", function () {
+          engine.resize();
+        });
+      });
+    </script>
+  </body>
+</html>
